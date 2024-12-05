@@ -2,8 +2,16 @@ import { deleteUser, findUser, findUserMail, User } from "../users"; // Usa un p
 import { Form, useLoaderData } from "@remix-run/react";
 import { LoaderFunction, ActionFunction,redirect} from "@remix-run/node";
 import { useForm } from "react-hook-form";
-// import { User } from "lucide-react";
-
+import { useEffect } from "react";
+// Aggiungi questa funzione per verificare l'autenticazione
+const checkAuth = () => {
+  if (typeof window !== "undefined") {
+    const storedUser = localStorage.getItem("userLogged");
+    if (!storedUser) return null;
+    return JSON.parse(storedUser);
+  }
+  return null;
+};
 
 export const loader: LoaderFunction = async ({ params }) => {
   const userId = params.id ? parseInt(params.id, 10) : NaN;
@@ -17,12 +25,16 @@ export const loader: LoaderFunction = async ({ params }) => {
     return redirect("/");
   }
   
-  // return new Response(JSON.stringify(user), {
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //   },
-  // });
-  return user;
+  // Aggiungi cookie o header di autenticazione
+  const headers = new Headers();
+  headers.append("Set-Cookie", `userId=${userId}; Path=/; HttpOnly`);
+
+  return new Response(JSON.stringify(user), {
+    headers: {
+      "Content-Type": "application/json",
+      ...Object.fromEntries(headers)
+    }
+  });
 };
 
 export const action: ActionFunction = async ({ params, request }) => {
@@ -46,6 +58,19 @@ export const action: ActionFunction = async ({ params, request }) => {
 
 const Profile = () => {
   const user = useLoaderData<User>();
+  const auth = checkAuth();
+
+   // Se non c'è autenticazione, reindirizza alla home
+   useEffect(() => {
+    if (!auth) {
+      window.location.href = "/";
+    }
+    // Verifica che l'ID dell'utente corrisponda
+    if (auth && auth.id !== user.id) {
+      window.location.href = "/";
+    }
+  }, [auth, user]);
+
   const handleClientSideLogout = (action: string) => {
     if (action === "logout" || action === "delete") {
       localStorage.removeItem("userLogged");
