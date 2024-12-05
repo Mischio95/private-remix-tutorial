@@ -92,10 +92,22 @@ export const AuthForm = ({
     formState: { errors },
   } = useForm<UserFormData>({
     resolver: zodResolver(userSchema),
+    defaultValues: {
+        imageUrl:""
+    }
   });
 
+  const onSubmitForm = (data: UserFormData) => {
+    // Se imageUrl è vuoto, lo impostiamo a null prima di inviare
+    const formData = {
+      ...data,
+      imageUrl: data.imageUrl || null
+    };
+    onSubmit(formData);
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-6">
+    <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-6 mt-6">
       {serverError && (
         <Alert variant="destructive">
           <AlertTitle>Errore</AlertTitle>
@@ -131,7 +143,8 @@ export const AuthForm = ({
       <div>
         <Label htmlFor="imageUrl">Immagine Profilo (opzionale)</Label>
         <Input
-          {...register("imageUrl")}
+          {...register("imageUrl")
+          }
           id="imageUrl"
           type="url"
           placeholder="https://esempio.com/immagine.jpg"
