@@ -7,7 +7,7 @@ import { renderToPipeableStream } from "react-dom/server";
 import { PrismaClient } from "@prisma/client";
 import { useForm } from "react-hook-form";
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Slot } from "@radix-ui/react-slot";
@@ -171,14 +171,6 @@ const deleteUser = async (id) => {
     where: { id }
   });
 };
-const checkAuth = () => {
-  if (typeof window !== "undefined") {
-    const storedUser = localStorage.getItem("userLogged");
-    if (!storedUser) return null;
-    return JSON.parse(storedUser);
-  }
-  return null;
-};
 const loader = async ({ params }) => {
   const userId = params.id ? parseInt(params.id, 10) : NaN;
   if (isNaN(userId)) {
@@ -214,15 +206,6 @@ const action$1 = async ({ params, request }) => {
 };
 const Profile = () => {
   const user = useLoaderData();
-  const auth = checkAuth();
-  useEffect(() => {
-    if (!auth) {
-      window.location.href = "/";
-    }
-    if (auth && auth.id !== user.id) {
-      window.location.href = "/";
-    }
-  }, [auth, user]);
   const handleClientSideLogout = (action2) => {
     if (action2 === "logout" || action2 === "delete") {
       localStorage.removeItem("userLogged");
@@ -541,7 +524,7 @@ const route2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProper
   action,
   default: Index
 }, Symbol.toStringTag, { value: "Module" }));
-const serverManifest = { "entry": { "module": "/assets/entry.client-hJIWdqcJ.js", "imports": ["/assets/components-BgpHWJhA.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/root-DZTBwpbW.js", "imports": ["/assets/components-BgpHWJhA.js"], "css": ["/assets/root-CsQPkmXk.css"] }, "routes/profile.$id": { "id": "routes/profile.$id", "parentId": "root", "path": "profile/:id", "index": void 0, "caseSensitive": void 0, "hasAction": true, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/profile._id-DaZsL4F8.js", "imports": ["/assets/components-BgpHWJhA.js", "/assets/index.esm-Dbg1b2jO.js"], "css": [] }, "routes/_index": { "id": "routes/_index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": true, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_index-I40VEUGk.js", "imports": ["/assets/components-BgpHWJhA.js", "/assets/index.esm-Dbg1b2jO.js"], "css": [] } }, "url": "/assets/manifest-f9690964.js", "version": "f9690964" };
+const serverManifest = { "entry": { "module": "/assets/entry.client-hJIWdqcJ.js", "imports": ["/assets/components-BgpHWJhA.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/root-DZTBwpbW.js", "imports": ["/assets/components-BgpHWJhA.js"], "css": ["/assets/root-CsQPkmXk.css"] }, "routes/profile.$id": { "id": "routes/profile.$id", "parentId": "root", "path": "profile/:id", "index": void 0, "caseSensitive": void 0, "hasAction": true, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/profile._id-B8NOGizd.js", "imports": ["/assets/components-BgpHWJhA.js", "/assets/index.esm-Dbg1b2jO.js"], "css": [] }, "routes/_index": { "id": "routes/_index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": true, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_index-I40VEUGk.js", "imports": ["/assets/components-BgpHWJhA.js", "/assets/index.esm-Dbg1b2jO.js"], "css": [] } }, "url": "/assets/manifest-b600e934.js", "version": "b600e934" };
 const mode = "production";
 const assetsBuildDirectory = "build/client";
 const basename = "/";
