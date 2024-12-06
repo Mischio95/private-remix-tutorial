@@ -4,14 +4,6 @@ import { LoaderFunction, ActionFunction,redirect} from "@remix-run/node";
 import { useForm } from "react-hook-form";
 import { useEffect } from "react";
 // Aggiungi questa funzione per verificare l'autenticazione
-const checkAuth = () => {
-  if (typeof window !== "undefined") {
-    const storedUser = localStorage.getItem("userLogged");
-    if (!storedUser) return null;
-    return JSON.parse(storedUser);
-  }
-  return null;
-};
 
 export const loader: LoaderFunction = async ({ params }) => {
   const userId = params.id ? parseInt(params.id, 10) : NaN;
@@ -58,18 +50,7 @@ export const action: ActionFunction = async ({ params, request }) => {
 
 const Profile = () => {
   const user = useLoaderData<User>();
-  const auth = checkAuth();
 
-   // Se non c'è autenticazione, reindirizza alla home
-   useEffect(() => {
-    if (!auth) {
-      window.location.href = "/";
-    }
-    // Verifica che l'ID dell'utente corrisponda
-    if (auth && auth.id !== user.id) {
-      window.location.href = "/";
-    }
-  }, [auth, user]);
 
   const handleClientSideLogout = (action: string) => {
     if (action === "logout" || action === "delete") {
