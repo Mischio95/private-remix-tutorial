@@ -3,7 +3,6 @@ import { Form, useLoaderData } from "@remix-run/react";
 import { LoaderFunction, ActionFunction,redirect} from "@remix-run/node";
 import { useForm } from "react-hook-form";
 import { useEffect } from "react";
-// Aggiungi questa funzione per verificare l'autenticazione
 
 export const loader: LoaderFunction = async ({ params }) => {
   const userId = params.id ? parseInt(params.id, 10) : NaN;
