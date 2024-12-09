@@ -1,4 +1,5 @@
 import prisma from './db';
+import { toast } from 'react-hot-toast';
 
 export interface User {
   id: number;

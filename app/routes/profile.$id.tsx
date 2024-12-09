@@ -5,21 +5,30 @@ import { useForm } from "react-hook-form";
 import { useEffect } from "react";
 
 export const loader: LoaderFunction = async ({ params }) => {
+  // Estrae e converte l'ID utente da stringa a numero
+  // Se non esiste, imposta NaN
   const userId = params.id ? parseInt(params.id, 10) : NaN;
 
   if (isNaN(userId)) {
     return redirect("/");
   }
 
+  // Cerca l'utente nel database usando l'ID
   const user = await findUser(userId);
   if (!user) {
     return redirect("/");
   }
   
-  // Aggiungi cookie o header di autenticazione
+  // Creazione degli headers della risposta
   const headers = new Headers();
+  // Aggiunge un cookie di sessione con l'ID dell'utente
+  // HttpOnly impedisce l'accesso via JavaScript per sicurezza
   headers.append("Set-Cookie", `userId=${userId}; Path=/; HttpOnly`);
 
+  // Restituisce la risposta con:
+  // - I dati dell'utente convertiti in JSON
+  // - Headers per il tipo di contenuto
+  // - Cookie di sessione
   return new Response(JSON.stringify(user), {
     headers: {
       "Content-Type": "application/json",
@@ -48,8 +57,8 @@ export const action: ActionFunction = async ({ params, request }) => {
 };
 
 const Profile = () => {
+  
   const user = useLoaderData<User>();
-
 
   const handleClientSideLogout = (action: string) => {
     if (action === "logout" || action === "delete") {

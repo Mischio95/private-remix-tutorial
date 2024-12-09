@@ -1,142 +1,3 @@
-// import type { MetaFunction } from "@remix-run/node";
-// import { Form, Link, useActionData, useNavigate } from "@remix-run/react";
-// import { useEffect, useState } from "react";
-// import { addUser, findUserByEmailPassword, User } from "../users"; // Usa un percorso relativo
-// type ActionData = {
-//   error?: string,
-//   user?: User
-// }
-// import { Button } from "~/components/ui/button"
-// import { Input } from "~/components/ui/input"
-// import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
-// import { Label } from "~/components/ui/label"
-// import { z } from "zod";
-// import { userSchema } from "~/validation/userSchemas";
-// import { useForm } from "react-hook-form";
-
-// // export const action = async ({request}: {request: Request}) => {
-// //   const fromData = await request.formData();
-// //   const name = fromData.get("name") as string;
-// //   const email = fromData.get("email") as string;
-// //   const password = fromData.get("password") as string;
-// //   const result = userSchema.safeParse({ name, email, password });
-
-// //   if (!result.success) {
-// //     const errors = result.error.errors.map((err) => err.message).join(", ");
-// //     return { error: errors };
-// //   }
-  
-// //   if (!email || !password) {
-// //     return Response.json({ error: "Email e password sono obbligatori" }, { status: 400 });
-// //   }
-
-// //   const existingUser = await findUserByEmailPassword(email, password);
-
-// //   if (!existingUser) {
-// //     const newUser = {
-// //       name,
-// //       email,
-// //       password
-// //     };
-// //     await addUser(newUser);
-// //     return Response.json({ user: newUser }, { status: 200 });
-// //   }
-
-// //   return Response.json({ user: existingUser }, { status: 200 });
-// // };
-
-// export const action = async ({ request }: { request: Request }) => {
-//   const formData = await request.formData();
-//   const name = formData.get("name") as string;
-//   const email = formData.get("email") as string;
-//   const password = formData.get("password") as string;
-
-//   //Validazione campi zod ( passo i parametri name, email e password )
-//   const result = userSchema.safeParse({ name, email, password });
-
-//   if (!result.success) {
-//     const errors = result.error.errors.map((err) => err.message).join(", ");
-//     return { error: errors };
-//   }
-
-//   const existingUser = await findUserByEmailPassword(email, password);
-
-//   if (!existingUser) {
-//     try {
-//       const newUser = {
-//         name,
-//         email,
-//         password
-//       };
-//       await addUser(newUser);
-//       return { user: newUser, message: "Registrazione effettuata con successo!" };
-//     } catch (error: any) {
-//       if (error?.code === 'P2002' && error?.meta.target.includes('email')) {
-//         return { error: "L'email è già registrata. Per favore, usa un'altra email." };
-//       }
-//       throw error;
-//     }
-//   }
-
-//   return { user: existingUser, message: "Login effettuato con successo!" };
-// };
-
-// export default function Index() {
-//   const actionData = useActionData<ActionData>();
-//   const navigate = useNavigate();
-//   const [message, setMessage] = useState<string | null>(null);
-
-//   // controllo che effettivamente sia loggato l'utente, in modo che possa essere reindirizzato alla sua pagina di profilo
-//   useEffect(() => { 
-//     const storedUser = localStorage.getItem("userLogged");
-//     if (storedUser) {
-//       const user = JSON.parse(storedUser);
-//       location.pathname = `/profile/${user.id}`;
-//     }
-//     if (actionData?.user) {
-//       localStorage.setItem("userLogged", JSON.stringify(actionData.user));
-//       setMessage("Login Effettuato con successo");
-//       setTimeout(() => {
-//       navigate(`/profile/${actionData.user?.id}`);
-//       }, 2000);
-//     }
-//   }, [actionData, navigate]);
-
-//   return (
-//     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
-//       <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
-//         <h1 className="text-2xl font-bold text-center text-gray-800">Registrazione / Login</h1>
-//         {actionData?.error && (
-//           <Alert>
-//             <AlertTitle>Error</AlertTitle>
-//             <AlertDescription>{actionData.error}</AlertDescription>
-//           </Alert>
-//         )}
-//         {message && (
-//           <Alert>
-//             <AlertDescription>{message}</AlertDescription>
-//           </Alert>
-//         )}
-//         <Form method="post" className="space-y-6 mt-6">
-//           <div>
-//             <Label htmlFor="name">Nome</Label>
-//             <Input type="text" name="name" id="name" />
-//           </div>
-//           <div>
-//             <Label htmlFor="email">Email</Label>
-//             <Input type="email" name="email" id="email" />
-//           </div>
-//           <div>
-//             <Label htmlFor="password">Password</Label>
-//             <Input type="password" name="password" id="password" />
-//           </div>
-//           <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">Login</Button>
-//         </Form>
-//       </div>
-//     </div>
-//   );
-// }
-
 import type { ActionFunction } from "@remix-run/node";
 import { Form, useActionData, useNavigate, useSubmit } from "@remix-run/react";
 import { useEffect, useState } from "react";
@@ -164,7 +25,7 @@ export const action: ActionFunction = async ({ request }) => {
   };
 
   try {
-    const validatedData = userSchema.parse(data);
+    const validatedData = userSchema.parse(data); // verifico che i dati restuiti siano corretti
     
     // Verifica se l'utente esiste già
     const existingUser = await findUserByEmailPassword(validatedData.email, validatedData.password);
@@ -178,10 +39,9 @@ export const action: ActionFunction = async ({ request }) => {
     if (emailExists) {
       return { error: "Email già registrata" };
     }
-
-    // Crea il nuovo utente
+    
     const user = await addUser(validatedData);
-    return { user };
+    return { user, setMessage: "Utente registrato con successo" };
 
   } catch (error) {
     if (error instanceof z.ZodError) {

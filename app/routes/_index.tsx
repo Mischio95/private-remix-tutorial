@@ -3,7 +3,6 @@ import Header from "~/components/ui/header";
 export default function Index() {
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Header */}
       <Header />
 
       {/* Main content */}
